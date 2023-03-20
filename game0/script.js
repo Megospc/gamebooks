@@ -2,7 +2,7 @@ var obj = {
   name: "Чан в сарае",
   options: {
     music: "music.mp3",
-    onstart: () => {
+    onstart: function() {
       var_("goldsearch", false);
       var_("dinamite", false);
       var_("lamp", false);
@@ -10,6 +10,12 @@ var obj = {
       room('start');
       var_("day", () => style = { background: "#803000", first: "#ffc070", second: "#ff8050", third: "#502000", backgroundbody: "#502000" });
       var_("night", () => style = { background: "#300080", first: "#70c0ff", second: "#5080ff", third: "#202050", backgroundbody: "#200050" });
+    },
+    render: function() {
+      ctx.fillStyle = style.third;
+      ctx.fillRect(X(800), Y(5), X(80), Y(30));
+      if (dinamite) ctx.drawImage(img('dinamite'), X(850), Y(10), X(18), Y(21));
+      if (lamp) ctx.drawImage(img('lamp'), X(812), Y(10), X(25), Y(23));
     }
   },
   assets: [
@@ -22,7 +28,9 @@ var obj = {
     { src: "melody.mp3", type: "sound", id: "melody" },
     { src: "kettles.mp3", type: "sound", id: "kettles:boom" },
     { src: "victory.mp3", type: "sound", id: "victory" },
-    { src: "electric.mp3", type: "sound", id: "electric" }
+    { src: "electric.mp3", type: "sound", id: "electric" },
+    { src: "dinamite.png", type: "image", id: "dinamite" },
+    { src: "lamp.png", type: "image", id: "lamp" }
   ],
   rooms: [
     { id: "start", f: function() {
@@ -36,7 +44,7 @@ var obj = {
       opt('Продолжить', () => { room('living-room') });
     } },
     { id: "living-room", f: function() {
-      println('Дверь позади закрылась. Вы находитесь в гостиной.Перед вами телевизор и две двери побокам\n(слева и справа).');
+      println('Дверь позади закрылась. Вы находитесь в гостиной.Перед вами телевизор и две двери по бокам\n(слева и справа).');
       opt('Включить телевизор', () =>  { room('TV:1') });
       opt('Зайти в первую дверь.', () =>  { room('cupboard-room') });
       opt('Зайти во вторую дверь.', () =>  { room('long-room') });
@@ -59,7 +67,7 @@ var obj = {
     { id: "cupboard:1", f: function() {
       sound('laugh');
       println('Вы залезли в шкаф. Там висела одежда.\nВдруг двеца шкафа захлопнулась.');
-      opt('Задолбить в дверь шкафа', () =>  { room('cupboard:boom') });
+      opt('Подолбить в дверь шкафа', () =>  { room('cupboard:boom') });
       opt('Поискать что-нибудь среди висящей в\nшкафу одежде', () =>  { room('cupboard:search1') });
     } },
     { id: "cupboard:search1", f: function() {
@@ -99,7 +107,7 @@ var obj = {
       opt('Продолжить', () =>  { room('gameover') });
     } },
     { id: "cupboard:button", f: function() {
-      println('Вы нажали на кнопку. Дверь шкафа\nоткрылась сама. Теперь вы можете выйти:');
+      println('Вы нажали на кнопку. Дверь шкафа\nоткрылась сама. Теперь вы можете выйти.');
       opt('Выйти', () =>  { room('cupboard-room') });
     } },
     { id: "long-room", f: function() {
@@ -222,7 +230,7 @@ var obj = {
     } },
     { id: "first-hall:4:climb:nolamp", f: function() {
       sound('bonk');
-      println('Когда вы перезали через трубы, и задели одну из них головой...');
+      println('Вы перелезали через трубы,\nи случайно задели одну из них головой...');
       opt('Продолжить', () =>  { room('gameover') });
     } },
     { id: "first-hall:4:climb:lamp", f: function() {
@@ -287,14 +295,14 @@ var obj = {
     { id: "first-hall:10", f: function() {
       println('Вы находитесь в круглой комнате.\nИз неё ведут три двери.\nПовсюду лежат чайники.');
       opt('Вернуться в холл', () =>  { room('first-hall') });
-      opt('Постучать по одному из чайников', () =>  { room('kettles:boom') });
-      opt('Зайти в первую дверь', () =>  { room('kettles:1') });
-      opt('Зайти во вторую дверь', () =>  { room('kettles:2') });
+      opt('Постучать по одному из чайников', () =>  { room('kettles:boom', 'first-hall:10') });
+      opt('Зайти в первую дверь', () =>  { room('kettles:1', 'first-hall:10') });
+      opt('Зайти во вторую дверь', () =>  { room('kettles:2', 'first-hall:10') });
       opt('Зайти в третью дверь', () =>  { room('floors-room') });
     } },
-    { id: "kettles:1", f: function() {
+    { id: "kettles:1", f: function(from) {
       println('Вы попали в небольшую столовую. Никого нет.\nПеред вами длинный стол. На нём стоит\nтарелка с кашей. Вы голодны.');
-      opt('Вернуться к чайникам', () =>  { room('floors-room:3') });
+      opt('Вернуться к чайникам', () =>  { room(from) });
       opt('Съесть кашу', () =>  { room('kettles:1:eat') });
     } },
     { id: "kettles:1:eat", f: function() {
@@ -302,23 +310,23 @@ var obj = {
       println('Вы съели кашу. Вдруг вы почувствовали тошноту...');
       opt('Продолжить', () =>  { room('gameover') });
     } },
-    { id: "kettles:2", f: function() {
+    { id: "kettles:2", f: function(from) {
       println('Вы находитесь в старом погребе.\nВезде лежат банки с солёными огурцами\nи помидорами.');
-      opt('Вернуться к чайникам', () =>  { room('floors-room:3') });
+      opt('Вернуться к чайникам', () =>  { room(from) });
     } },
-    { id: "kettles:boom", f: function() {
+    { id: "kettles:boom", f: function(from) {
       sound('kettles:boom');
       println('Вы постучали по чайникам.\nВдруг они превратились в кастрюли...');
-      opt('Продолжить', () =>  { room('pans') });
+      opt('Продолжить', () =>  { room('pans', from) });
     } },
-    { id: "pans", f: function() {
+    { id: "pans", f: function(from) {
       println('Вы находитесь в круглой комнате. Из неё\nведёт одна дверь. Повсюду лежат кастрюли.');
-      opt('Постучать по одной из кастрюль', () =>  { room('pans:boom') });
-      opt('Зайти в дверь', () =>  { room('pans:1') });
+      opt('Постучать по одной из кастрюль', () =>  { room('pans:boom', from) });
+      opt('Зайти в дверь', () =>  { room('pans:1', from) });
     } },
-    { id: "pans:1", f: function() {
+    { id: "pans:1", f: function(from) {
       println('Вы находитесь в просторной пустой комнате.\nИз неё ведёт одна дверь.');
-      opt('Вернуться к кастрюлям', () =>  { room('pans') });
+      opt('Вернуться к кастрюлям', () =>  { room('pans', from) });
       opt('Зайти в дверь', () =>  { room('pans:1:fall') });
     } },
     { id: "pans:1:fall", f: function() {
@@ -326,10 +334,10 @@ var obj = {
       println('Вы вступили за порог. И вдруг оказалось,\nчто пола нет. Вы начали падать вниз...');
       opt('Продолжить', () =>  { room('gameover') });
     } },
-    { id: "pans:boom", f: function() {
+    { id: "pans:boom", f: function(from) {
       sound('kettles:boom');
       println('Вы постучали по кастрюлям.\nВдруг они превратились в чайники...');
-      opt('Продолжить', () =>  { room('floors-room:3') });
+      opt('Продолжить', () =>  { room(from) });
     } },
     { id: "floors-room", f: function() {
       println('Вы находитесь в небольшой комнате.\nИз неё ведут три двери. На первой написано\n«Второй этаж», на второй — «Минус первый этаж»,\nна третьей — ничего.');
@@ -345,15 +353,15 @@ var obj = {
     { id: "floors-room:2", f: function() {
       println('Перед вами  лестница ведущая вниз.');
       opt('Вернуться в пустую комнату', () =>  { room('floors-room') });
-      opt('Опуститься по лестнице', () =>  { room('third-hall') });
+      opt('Спуститься по лестнице', () =>  { room('third-hall') });
     } },
     { id: "floors-room:3", f: function() {
       println('Вы находитесь в круглой комнате.\nИз неё ведут три двери.\nПовсюду лежат чайники.');
       opt('Вернуться в пустую комнату', () =>  { room('floors-room') });
-      opt('Постучать по одному из чайников', () =>  { room('kettles:boom') });
+      opt('Постучать по одному из чайников', () =>  { room('kettles:boom', 'floors-room:3') });
       opt('Зайти в первую дверь', () =>  { room('first-hall') });
-      opt('Зайти во вторую дверь', () =>  { room('kettles:1') });
-      opt('Зайти в третью дверь', () =>  { room('kettles:2') });
+      opt('Зайти во вторую дверь', () =>  { room('kettles:1', 'floors-room:3') });
+      opt('Зайти в третью дверь', () =>  { room('kettles:2', 'floors-room:3') });
     } },
     { id: "second-hall", f: function() {
       println('Вы попали в большой светлый холл.\nИз него ведут пять дверей.');
@@ -572,12 +580,12 @@ var obj = {
     } },
     { id: "gameover", f: function() {
       sound('gameover');
-      println('Мир погрузился в темноту: Игра завершена.');
+      println('Мир погрузился в темноту: игра завершена.');
       opt('Начать заново', () =>  { room('start') });
     } },
     { id: "about", f: function() {
-      println('Автор идеи: Volodya2021\nАвтор: Megospace\nДата выпуска: 18.03.2023\n Количество комнат: ');
-      println(obj.rooms.length);
+      println('Автор идеи: Volodya2021\nРазработчик: Megospace\nДата выпуска: 18.03.2023\nМузыка и звуки: zvukipro.com\nВерсия: 1.0.5\nКоличество комнат: 100');
+      println('\n@@@     @@@  @@@@@@   @@@@@@    @@@@@@\n@@@@   @@@@  @@      @@        @@    @@\n@@ @@ @@ @@  @@@@@@  @@   @@@  @@    @@\n@@  @@@  @@  @@      @@    @@  @@    @@\n@@       @@  @@@@@@   @@@@@@    @@@@@@\n\n @@@@@@  @@@@@@    @@@@@@   @@@@@@  @@@@@@\n@@       @@   @@  @@    @@  @@      @@\n @@@@@   @@@@@@   @@    @@  @@      @@@@@@\n     @@  @@       @@@@@@@@  @@      @@\n@@@@@@   @@       @@    @@  @@@@@@  @@@@@@');
       opt('Назад', () =>  { room('first-hall:5:lamp') });
     } }
   ]
