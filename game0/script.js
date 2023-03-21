@@ -7,16 +7,18 @@ var obj = {
       var_("dinamite", false);
       var_("lamp", false);
       var_("rathint", false);
-      room('start');
-      var_("day", () => style = { background: "#803000", first: "#ffc070", second: "#ff8050", third: "#502000", backgroundbody: "#502000" });
-      var_("night", () => style = { background: "#300080", first: "#70c0ff", second: "#5080ff", third: "#202050", backgroundbody: "#200050" });
+      if (gamebook.restore) {
+        println('Открыть сохранение прогресса?');
+        opt('да', () =>  { restore() });
+        opt('нет', () =>  { room('start') });
+      }
+      else room('start');
     },
     render: function() {
-      ctx.fillStyle = style.third;
-      ctx.fillRect(X(750), Y(5), X(80), Y(30));
       if (dinamite) ctx.drawImage(img('dinamite'), X(800), Y(10), X(18), Y(21));
       if (lamp) ctx.drawImage(img('lamp'), X(762), Y(10), X(25), Y(23));
-    }
+    },
+    room: () => save()
   },
   assets: [
     { src: "boom.mp3", type: "sound", id: "boom" },
@@ -584,9 +586,27 @@ var obj = {
       opt('Начать заново', () =>  { room('start') });
     } },
     { id: "about", f: function() {
-      println('Автор идеи: Volodya2021\nРазработчик: Megospace\nДата выпуска: 18.03.2023\nМузыка и звуки: zvukipro.com\nВерсия: 1.0.6\nКоличество комнат: 100');
+      println('Автор идеи: Volodya2021\nРазработчик: Megospace\nДата выпуска: 18.03.2023\nМузыка и звуки: zvukipro.com\nВерсия: 1.0.7\nКоличество комнат: 100');
       println('\n@@@     @@@  @@@@@@   @@@@@@    @@@@@@\n@@@@   @@@@  @@      @@        @@    @@\n@@ @@ @@ @@  @@@@@@  @@   @@@  @@    @@\n@@  @@@  @@  @@      @@    @@  @@    @@\n@@       @@  @@@@@@   @@@@@@    @@@@@@\n\n @@@@@@  @@@@@@    @@@@@@   @@@@@@  @@@@@@\n@@       @@   @@  @@    @@  @@      @@\n @@@@@   @@@@@@   @@    @@  @@      @@@@@@\n     @@  @@       @@@@@@@@  @@      @@\n@@@@@@   @@       @@    @@  @@@@@@  @@@@@@');
       opt('Назад', () =>  { room('first-hall:5:lamp') });
     } }
   ]
 };
+function day() {
+  style = {
+    background: "#803000",
+    first: "#ffc070",
+    second: "#ff8050",
+    third: "#502000",
+    backgroundbody: "#502000"
+  };
+}
+function night() {
+  style = {
+    background: "#300080",
+    first: "#70c0ff",
+    second: "#5080ff",
+    third: "#202050", 
+    backgroundbody: "#200050"
+  }; 
+}
