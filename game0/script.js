@@ -1,12 +1,13 @@
 var obj = {
   name: "Чан в сарае",
+  version: "1.0.7",
   options: {
     music: "music.mp3",
     onstart: function() {
-      var_("goldsearch", false);
-      var_("dinamite", false);
-      var_("lamp", false);
-      var_("rathint", false);
+      variable("goldsearch", false);
+      variable("dinamite", false);
+      variable("lamp", false);
+      variable("rathint", false);
       if (gamebook.restore) {
         println('Открыть сохранение прогресса?');
         opt('да', () =>  { restore() });
@@ -594,7 +595,7 @@ var obj = {
   ]
 };
 function day() {
-  style = {
+  gamebook.style = {
     background: "#803000",
     first: "#ffc070",
     second: "#ff8050",
@@ -603,11 +604,11 @@ function day() {
   };
 }
 function night() {
-  style = {
+  gamebook.style = {
     background: "#300080",
     first: "#70c0ff",
     second: "#5080ff",
     third: "#202050", 
     backgroundbody: "#200050"
-  }; 
+  };
 }
