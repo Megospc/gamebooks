@@ -1,28 +1,33 @@
 var obj = {
   name:  "Домик в горах",
+  version: "0.2.2",
   options: {
     music: "music.mp3",
     onstart: () => {
-      var_("dies", 0);
-      var_("achs", [false, false, false]);
-      var_("skis", false);
-      var_("fivefloor", false);
-      var_("roommap", []);
-      var_("roomc", 0);
+      variable("dies", 0);
+      variable("achs", [false, false, false]);
+      variable("skis", false);
+      variable("fivefloor", false);
+      variable("rooms", []);
+      variable("roomc", 0);
       if (gamebook.restore) restore();
       else room('start');
     },
     render: () => {
+      const ctx = gamebook.ctx;
+      const style = obj.style;
+      const cameraY = gamebook.special.cy;
       ctx.fillStyle = style.first;
       ctx.font = `${X(18)}px font`;
-      if (roomid!= 'stats') ctx.fillText("Настройки", X(50), Y(20-cameraY));
+      if (gamebook.room.id != 'stats' && gamebook.room.id != 'about') ctx.fillText("Настройки", X(50), Y(20-cameraY));
     },
     touchstart: (x, y) => {
-      if (x < 100 && y < 20-cameraY&& roomid != 'stats') room('stats', roomid, roomargs);
+      const cameraY = gamebook.special.cy;
+      if (x < 100 && y < 20-cameraY && gamebook.room.id != 'stats' && gamebook.room.id != 'about') room('stats', gamebook.room.id, gamebook.room.args);
     },
     room: () => {
-      if (!roommap[roomindex]) {
-        roommap[roomindex] = true;
+      if (!rooms[gamebook.room.i]) {
+        rooms[gamebook.room.i] = true;
         roomc++;
       }
       save();
@@ -422,7 +427,7 @@ var obj = {
       }
     } },
     { id: "about", f: function(from, back) {
-      println('Автор идеи: Megospace\nРазработчик: Megospace\nДата выпуска: 01.04.2023\nМузыка и звуки: zvukipro.com\nВерсия: 0.2.1 (пре-альфа)\nКоличество комнат: 65');
+      println('Автор идеи: Megospace\nРазработчик: Megospace\nДата выпуска: 01.04.2023\nМузыка и звуки: zvukipro.com\nВерсия: 0.2.2 (пре-альфа)\nКоличество комнат: 65');
       println('\n@@@     @@@  @@@@@@   @@@@@@    @@@@@@\n@@@@   @@@@  @@      @@        @@    @@\n@@ @@ @@ @@  @@@@@@  @@   @@@  @@    @@\n@@  @@@  @@  @@      @@    @@  @@    @@\n@@       @@  @@@@@@   @@@@@@    @@@@@@\n\n @@@@@@  @@@@@@    @@@@@@   @@@@@@  @@@@@@\n@@       @@   @@  @@    @@  @@      @@\n @@@@@   @@@@@@   @@    @@  @@      @@@@@@\n     @@  @@       @@@@@@@@  @@      @@\n@@@@@@   @@       @@    @@  @@@@@@  @@@@@@');
       opt('Назад', () =>  { room('stats', from, back) });
     } }
@@ -438,7 +443,7 @@ function restart() {
   room('start');
 }
 function day() {
-  style = {
+  gamebook.style = {
     background: "#803000",
     first: "#ffc070",
     second: "#ff8050",
@@ -447,7 +452,7 @@ function day() {
   };
 }
 function night() {
-  style = {
+  gamebook.style = {
     background: "#300080",
     first: "#70c0ff",
     second: "#5080ff",
@@ -456,7 +461,7 @@ function night() {
   };
 }
 function dark() {
-  style = {
+  gamebook.style = {
     background: "#404040",
     first: "#c0c0c0",
     second: "#a0a0a0",
@@ -465,7 +470,7 @@ function dark() {
   };
 }
 function cave() {
-  style = {
+  gamebook.style = {
     background: "#205050",
     first: "#50d0d0",
     second: "#30d0d0",
