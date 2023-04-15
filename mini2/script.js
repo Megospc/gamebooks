@@ -1,10 +1,11 @@
 var obj = {
   name: "Прятки",
-  version: "1.0.0",
+  version: "1.0.1",
   options: {
     music: "music.mp3",
     onstart: () => {
       variable("found", new Array(5).fill(false));
+      variable("TV", false);
       if (gamebook.restore) {
         println('Открыть сохранение прогресса?');
         opt('да', () => restore());
@@ -71,7 +72,7 @@ var obj = {
     { id: "hall:l1:door", f: function() {
       println('Вы находитесь в небольшой спальне.\nПеред вами кровать.');
       opt('Выйти в пустую комнату', () => room('hall:l1'));
-      opt('Заглянуть под кровать', () => room('hall:l1:door:under'));
+      if (TV) opt('Заглянуть под кровать', () => room('hall:l1:door:under'));
     } },
     { id: "hall:l1:door:under", f: function() {
       if (found[1]) {
@@ -96,8 +97,9 @@ var obj = {
       opt('Включить телевизор', () => room('hall:l2:door:turnon'));
     } },
     { id: "hall:l2:door:turnon", f: function() {
-      println('Вы включили телевизор. На нём появилась\nнадпись: «Один из твоих друзей в спальне».')
+      println('Вы включили телевизор. На нём появилась\nнадпись: «Один из твоих друзей в спальне».');
       opt('Выключить телевизор', () => room('hall:l2:door'));
+      TV = true;
     } },
     { id: "hall:r1", f: function() {
       println('За дверью оказалась стена.');
